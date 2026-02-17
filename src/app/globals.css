@@ -1,0 +1,627 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom animations */
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.slide-in-from-top-2 {
+  animation-name: slide-in-from-top;
+}
+
+.slide-in-from-bottom-4 {
+  animation-name: slide-in-from-bottom;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+.duration-300 {
+  animation-duration: 300ms;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Primary palette - Violet */
+  --primary-50: #f5f3ff;
+  --primary-100: #ede9fe;
+  --primary-200: #ddd6fe;
+  --primary-300: #c4b5fd;
+  --primary-400: #a78bfa;
+  --primary-500: #8b5cf6;
+  --primary-600: #7c3aed;
+  --primary-700: #6d28d9;
+  --primary-800: #5b21b6;
+  --primary-900: #4c1d95;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-shantell);
+  --font-mono: var(--font-geist-mono);
+
+  /* Primary color tokens */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+}
+
+.dark {
+  --background: #0f0f0f;
+  --foreground: #f1f1f1;
+
+  --primary-50: #1a1625;
+  --primary-100: #2a1f3d;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-shantell), "Shantell Sans", sans-serif;
+}
+
+/* View Transition - circle expand */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* Dark mode global overrides - YouTube-style dark */
+.dark {
+  /* Cards & surfaces */
+  & .bg-white {
+    background-color: #212121;
+  }
+  & .bg-gray-50 {
+    background-color: #212121;
+  }
+  & .bg-gray-100 {
+    background-color: #181818;
+  }
+
+  /* Borders */
+  & .border-gray-100 {
+    border-color: #303030;
+  }
+  & .border-gray-200 {
+    border-color: #3f3f3f;
+  }
+
+  /* Text */
+  & .text-gray-900 {
+    color: #f1f1f1;
+  }
+  & .text-gray-800 {
+    color: #e0e0e0;
+  }
+  & .text-gray-700 {
+    color: #c0c0c0;
+  }
+  & .text-gray-600:not(:hover) {
+    color: #aaaaaa;
+  }
+  & .text-gray-500:not(:hover) {
+    color: #aaaaaa;
+  }
+  & .text-gray-400 {
+    color: #717171;
+  }
+
+  /* Backgrounds with opacity */
+  & .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  & .bg-emerald-50 {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  & .bg-orange-50 {
+    background-color: rgba(249, 115, 22, 0.15);
+  }
+  & .bg-orange-100 {
+    background-color: rgba(249, 115, 22, 0.2);
+  }
+  & .bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  & .bg-green-50 {
+    background-color: rgba(16, 185, 129, 0.15);
+  }
+  & .bg-primary-100 {
+    background-color: rgba(139, 92, 246, 0.2);
+  }
+
+  /* Hover states */
+  & .hover\:bg-gray-50:hover {
+    background-color: #3f3f3f;
+  }
+  & .hover\:bg-gray-100:hover {
+    background-color: #3f3f3f;
+  }
+  /* Dividers (Tailwind v4 uses :not(:last-child) instead of * + *) */
+  & .divide-gray-100 > :not(:last-child) {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  & .divide-gray-200 > :not(:last-child) {
+    border-color: #3f3f3f;
+  }
+  /* Remove border-top on first child to prevent double border with header's border-b */
+  & .divide-y > :first-child {
+    border-top-width: 0;
+  }
+
+  /* Shadows */
+  & .shadow-sm {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  & .shadow-lg {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Chart text inside SVG */
+  & .fill-gray-900 {
+    fill: #f1f1f1;
+  }
+  & .fill-gray-500 {
+    fill: #aaaaaa;
+  }
+
+  /* Inputs */
+  & input,
+  & select,
+  & textarea {
+    background-color: #212121;
+    border-color: #3f3f3f;
+    color: #f1f1f1;
+  }
+
+  /* Recharts */
+  & .recharts-legend-item-text {
+    color: #c0c0c0 !important;
+  }
+  & .recharts-cartesian-axis-tick-value {
+    fill: #c0c0c0 !important;
+  }
+  & .recharts-cartesian-grid line {
+    stroke: #303030 !important;
+  }
+  & .recharts-cartesian-axis-line {
+    stroke: #3f3f3f !important;
+  }
+
+  /* Loading skeleton */
+  & .bg-gray-200 {
+    background-color: #303030;
+  }
+
+  /* Shadow overrides */
+  & .shadow-2xl {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Safe area for iOS devices */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Skeleton loading */
+.skeleton {
+  background-color: #e5e7eb; /* gray-200 */
+}
+.skeleton-light {
+  background-color: #f3f4f6; /* gray-100 */
+}
+.skeleton-card {
+  background-color: #ffffff;
+  border-color: #f3f4f6;
+}
+.dark .skeleton {
+  background-color: #3f3f3f;
+}
+.dark .skeleton-light {
+  background-color: #333333;
+}
+.dark .skeleton-card {
+  background-color: #212121;
+  border-color: #303030;
+}
+
+/* Bounce animation delays for loading dots */
+.bounce-delay-150 {
+  animation-delay: 150ms;
+}
+.bounce-delay-300 {
+  animation-delay: 300ms;
+}
+
+/* Reserve scrollbar space to prevent layout shift */
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
+/* Scrollbar - both modes */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #181818;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f3f;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Antd RangePicker — compact filter style */
+.ant-rangepicker-custom.ant-picker {
+  width: 280px !important;
+  height: auto !important;
+  padding: 0.75rem 0.75rem !important;
+  border-width: 2px !important;
+  border-color: #e5e7eb !important;
+  border-radius: 1rem !important;
+  background: #fff !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+  transition: all 0.2s ease-out !important;
+  box-shadow: none !important;
+}
+
+.ant-rangepicker-custom .ant-picker-input > input {
+  width: 80px !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  color: #1f2937 !important;
+  font-family: inherit !important;
+}
+
+.ant-rangepicker-custom:hover {
+  border-color: #d1d5db !important;
+}
+
+.ant-rangepicker-custom.ant-picker-focused {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;
+}
+
+.ant-rangepicker-custom .ant-picker-input > input::placeholder {
+  color: #9ca3af !important;
+  font-weight: 400 !important;
+}
+
+.ant-rangepicker-custom .ant-picker-suffix {
+  color: #9ca3af !important;
+}
+
+.ant-rangepicker-custom .ant-picker-clear {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  border-radius: 50% !important;
+  opacity: 0 !important;
+  padding: 2px !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.ant-rangepicker-custom:hover .ant-picker-clear {
+  opacity: 1 !important;
+}
+
+.ant-rangepicker-custom .ant-picker-clear:hover {
+  background: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+.ant-rangepicker-custom .ant-picker-range-separator {
+  padding: 0 6px !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom.ant-picker {
+  background: #212121 !important;
+  border-color: #303030 !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom:hover {
+  border-color: #404040 !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom.ant-picker-focused {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15) !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom .ant-picker-input > input {
+  color: #f1f1f1 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom .ant-picker-input > input::placeholder {
+  color: #717171 !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom .ant-picker-suffix {
+  color: #aaaaaa !important;
+}
+
+:where(.dark, .dark *) .ant-rangepicker-custom .ant-picker-clear {
+  background: #525252 !important;
+  color: #d4d4d4 !important;
+}
+
+.dark .ant-rangepicker-custom .ant-picker-clear:hover {
+  background: #636363 !important;
+  color: #f1f1f1 !important;
+}
+
+.dark .ant-rangepicker-custom .ant-picker-range-separator .ant-picker-separator {
+  color: #717171 !important;
+}
+
+.dark .ant-rangepicker-custom .ant-picker-active-bar {
+  background: var(--primary-500) !important;
+}
+
+/* Antd DatePicker - match Input component styling */
+.ant-datepicker-custom {
+  width: 100% !important;
+  height: auto !important;
+  padding: 0.875rem 1rem !important; /* py-3.5 px-4 */
+  border-width: 2px !important;
+  border-color: #e5e7eb !important; /* border-gray-200 */
+  border-radius: 1rem !important; /* rounded-2xl */
+  background: #fff !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important; /* text-gray-800 */
+  transition: all 0.2s ease-out !important;
+  box-shadow: none !important;
+}
+
+.ant-datepicker-custom:hover {
+  border-color: #d1d5db !important; /* hover:border-gray-300 */
+}
+
+.ant-datepicker-custom.ant-picker-focused {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important; /* focus:ring-primary-500/10 */
+}
+
+.ant-datepicker-custom .ant-picker-input > input {
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  color: #1f2937 !important;
+  font-family: inherit !important;
+}
+
+.ant-datepicker-custom .ant-picker-input > input::placeholder {
+  color: #9ca3af !important;
+  font-weight: 400 !important;
+}
+
+.ant-datepicker-custom .ant-picker-suffix {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown {
+  font-family: inherit !important;
+}
+
+.dark .ant-datepicker-custom {
+  background: #212121 !important;
+  border-color: #303030 !important;
+}
+
+.dark .ant-datepicker-custom:hover {
+  border-color: #404040 !important;
+}
+
+.dark .ant-datepicker-custom.ant-picker-focused {
+  border-color: var(--primary-500) !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15) !important;
+}
+
+.dark .ant-datepicker-custom .ant-picker-input > input {
+  color: #f1f1f1 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.dark .ant-datepicker-custom .ant-picker-input > input::placeholder {
+  color: #717171 !important;
+}
+
+.dark .ant-datepicker-custom .ant-picker-suffix {
+  color: #aaaaaa !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-panel-container {
+  background: #212121 !important;
+  border: 1px solid #3f3f3f !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-header {
+  border-bottom-color: #3f3f3f !important;
+  color: #f1f1f1 !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-header button {
+  color: #aaaaaa !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-header button:hover {
+  color: #a78bfa !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-body th {
+  color: #aaaaaa !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell {
+  color: #555555 !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-in-view {
+  color: #f1f1f1 !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell:hover .ant-picker-cell-inner {
+  background: rgba(139, 92, 246, 0.2) !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-selected .ant-picker-cell-inner {
+  background: var(--primary-500) !important;
+  color: #fff !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--primary-500) !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-footer {
+  border-top-color: #3f3f3f !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-today-btn {
+  color: #a78bfa !important;
+}
+
+/* Range selection — make start/end ::before cover full cell */
+.ant-picker-dropdown .ant-picker-cell-range-start::before,
+.ant-picker-dropdown .ant-picker-cell-range-end::before {
+  inset-inline-start: 0 !important;
+  inset-inline-end: 0 !important;
+}
+
+/* Range selection — in-range cells (light mode) */
+.ant-picker-dropdown .ant-picker-cell-in-range::before,
+.ant-picker-dropdown .ant-picker-cell-range-start::before,
+.ant-picker-dropdown .ant-picker-cell-range-end::before {
+  background: rgba(139, 92, 246, 0.08) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-in-range .ant-picker-cell-inner {
+  color: inherit !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-dropdown .ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: var(--primary-500) !important;
+  color: #fff !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-range-hover::before,
+.ant-picker-dropdown .ant-picker-cell-range-hover-start::before,
+.ant-picker-dropdown .ant-picker-cell-range-hover-end::before {
+  background: rgba(139, 92, 246, 0.12) !important;
+}
+
+/* Range selection — dark mode */
+.dark .ant-picker-dropdown .ant-picker-cell-in-range::before,
+.dark .ant-picker-dropdown .ant-picker-cell-range-start::before,
+.dark .ant-picker-dropdown .ant-picker-cell-range-end::before {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-in-range .ant-picker-cell-inner {
+  color: #f1f1f1 !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-range-start .ant-picker-cell-inner,
+.dark .ant-picker-dropdown .ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: rgba(139, 92, 246, 0.35) !important;
+  color: #f1f1f1 !important;
+}
+
+.dark .ant-picker-dropdown .ant-picker-cell-range-hover::before,
+.dark .ant-picker-dropdown .ant-picker-cell-range-hover-start::before,
+.dark .ant-picker-dropdown .ant-picker-cell-range-hover-end::before {
+  background: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Disabled date cells */
+.ant-picker-dropdown .ant-picker-cell-disabled {
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-disabled .ant-picker-cell-inner {
+  text-decoration: line-through !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-disabled::before {
+  background: transparent !important;
+}
