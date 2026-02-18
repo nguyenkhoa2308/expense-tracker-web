@@ -1,38 +1,77 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Loader2, X, Send, Sparkles, Trash2, Zap, Check, XIcon } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { aiApi, ChatMessage, ParsedTransaction } from '@/lib/api';
-import { cn } from '@/lib/utils';
-import { useToastStore } from '@/store';
+import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  Loader2,
+  X,
+  Send,
+  Sparkles,
+  Trash2,
+  Zap,
+  Check,
+  XIcon,
+  Copy,
+  CheckCheck,
+  RefreshCw,
+} from "lucide-react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { aiApi, ChatMessage, ParsedTransaction } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { useToastStore } from "@/store";
 
 const EXPENSE_CATEGORIES: Record<string, string> = {
-  food: 'Ăn uống', transport: 'Di chuyển', shopping: 'Mua sắm',
-  entertainment: 'Giải trí', bills: 'Hóa đơn', health: 'Sức khỏe',
-  education: 'Học tập', transfer: 'Chuyển khoản', other: 'Khác',
+  food: "Ăn uống",
+  transport: "Di chuyển",
+  shopping: "Mua sắm",
+  entertainment: "Giải trí",
+  bills: "Hóa đơn",
+  health: "Sức khỏe",
+  education: "Học tập",
+  transfer: "Chuyển khoản",
+  other: "Khác",
 };
 const INCOME_CATEGORIES: Record<string, string> = {
-  salary: 'Lương', freelance: 'Freelance', investment: 'Đầu tư',
-  bonus: 'Thưởng', gift: 'Quà tặng', refund: 'Hoàn tiền', other: 'Khác',
+  salary: "Lương",
+  freelance: "Freelance",
+  investment: "Đầu tư",
+  bonus: "Thưởng",
+  gift: "Quà tặng",
+  refund: "Hoàn tiền",
+  other: "Khác",
 };
 
 const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    amount,
+  );
 
-const CHART_COLORS = ['#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#10B981', '#3B82F6', '#F59E0B', '#EF4444'];
+const CHART_COLORS = [
+  "#7c3aed",
+  "#8b5cf6",
+  "#a78bfa",
+  "#c4b5fd",
+  "#ddd6fe",
+  "#10B981",
+  "#3B82F6",
+  "#F59E0B",
+  "#EF4444",
+];
 
 // Parse AI message for category data (e.g. "- Ăn uống: 2.000.000 ₫ (45%)")
 function extractChartData(text: string): { name: string; value: number }[] {
-  const lines = text.split('\n');
+  const lines = text.split("\n");
   const data: { name: string; value: number }[] = [];
 
   for (const line of lines) {
     // Match patterns like: "- Ăn uống: 2.000.000 ₫ (45%)" or "- **Ăn uống** (45%)" or "- Ăn uống (45%)"
-    const match = line.match(/[-•]\s*\*{0,2}([^*:(\n]+?)\*{0,2}\s*(?::[^(]*?)?\((\d+(?:[.,]\d+)?)%\)/);
+    const match = line.match(
+      /[-•]\s*\*{0,2}([^*:(\n]+?)\*{0,2}\s*(?::[^(]*?)?\((\d+(?:[.,]\d+)?)%\)/,
+    );
     if (match) {
       const name = match[1].trim();
-      const value = parseFloat(match[2].replace(',', '.'));
+      const value = parseFloat(match[2].replace(",", "."));
       if (value > 0 && name.length > 1 && name.length < 30) {
         data.push({ name, value });
       }
@@ -57,7 +96,10 @@ function MiniChart({ data }: { data: { name: string; value: number }[] }) {
             dataKey="value"
           >
             {data.map((_, index) => (
-              <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+              <Cell
+                key={index}
+                fill={CHART_COLORS[index % CHART_COLORS.length]}
+              />
             ))}
           </Pie>
           <Tooltip formatter={(value: number) => `${value}%`} />
@@ -65,8 +107,14 @@ function MiniChart({ data }: { data: { name: string; value: number }[] }) {
       </ResponsiveContainer>
       <div className="flex flex-wrap gap-1.5 mt-1">
         {data.map((item, i) => (
-          <span key={i} className="flex items-center gap-1 text-[10px] text-gray-600 dark:text-gray-400">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+          <span
+            key={i}
+            className="flex items-center gap-1 text-[10px] text-gray-600 dark:text-gray-400"
+          >
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+            />
             {item.name}
           </span>
         ))}
@@ -78,30 +126,35 @@ function MiniChart({ data }: { data: { name: string; value: number }[] }) {
 // Detect if text looks like a transaction (has amount pattern)
 function looksLikeTransaction(text: string): boolean {
   // Match patterns like: 45k, 50K, 1tr, 2TR, 100đ, 200.000, 1,500,000, 100 nghìn, 2 triệu, 1 củ
-  return /\d+\s*(k|K|tr|TR|đ|Đ|nghìn|nghin|triệu|trieu|củ|cu)\b/.test(text)
-    || /\d{2,3}([.,]\d{3})+/.test(text);
+  return (
+    /\d+\s*(k|K|tr|TR|đ|Đ|nghìn|nghin|triệu|trieu|củ|cu)\b/.test(text) ||
+    /\d{2,3}([.,]\d{3})+/.test(text)
+  );
 }
 
 export function AiChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
+  const [streamingContent, setStreamingContent] = useState("");
   const [parsedTx, setParsedTx] = useState<ParsedTransaction | null>(null);
   const [parsing, setParsing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const initializedRef = useRef(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const toast = useToastStore();
 
   const scrollToBottom = (instant = false) => {
     if (instant && messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
     } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -118,12 +171,22 @@ export function AiChat() {
   // Lock body scroll when sidebar is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = Math.min(el.scrollHeight, 128) + "px";
+    }
+  }, [input]);
 
   const loadHistory = useCallback(async () => {
     if (initializedRef.current) return;
@@ -149,12 +212,15 @@ export function AiChat() {
     setLoading(true);
     try {
       const res = await aiApi.getInsights();
-      setMessages([{ role: 'assistant', content: res.data.insights }]);
+      setMessages([{ role: "assistant", content: res.data.insights }]);
     } catch {
-      setMessages([{
-        role: 'assistant',
-        content: 'Xin chào! Tôi là trợ lý AI giúp bạn quản lý chi tiêu. Hãy hỏi tôi bất cứ điều gì!',
-      }]);
+      setMessages([
+        {
+          role: "assistant",
+          content:
+            "Xin chào! Tôi là trợ lý AI giúp bạn quản lý chi tiêu. Hãy hỏi tôi bất cứ điều gì!",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -173,27 +239,27 @@ export function AiChat() {
     const userMessage = input.trim();
     // Auto-detect transaction and parse instead of chat
     if (looksLikeTransaction(userMessage)) {
-      setInput('');
-      setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+      setInput("");
+      setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
       setParsing(true);
       try {
         const res = await aiApi.parse(userMessage);
         setParsedTx(res.data);
       } catch {
-        toast.error('Không thể phân tích giao dịch');
+        toast.error("Không thể phân tích giao dịch");
       } finally {
         setParsing(false);
       }
       return;
     }
 
-    setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    setInput("");
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
-    setStreamingContent('');
+    setStreamingContent("");
 
     try {
-      let accumulated = '';
+      let accumulated = "";
       await aiApi.chatStream(
         userMessage,
         (chunk) => {
@@ -201,17 +267,23 @@ export function AiChat() {
           setStreamingContent(accumulated);
         },
         () => {
-          setMessages((prev) => [...prev, { role: 'assistant', content: accumulated }]);
-          setStreamingContent('');
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: accumulated },
+          ]);
+          setStreamingContent("");
           setLoading(false);
         },
       );
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại sau.' },
+        {
+          role: "assistant",
+          content: "Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại sau.",
+        },
       ]);
-      setStreamingContent('');
+      setStreamingContent("");
       setLoading(false);
     }
   };
@@ -224,9 +296,9 @@ export function AiChat() {
     try {
       const res = await aiApi.parse(text);
       setParsedTx(res.data);
-      setInput('');
+      setInput("");
     } catch {
-      toast.error('Không thể phân tích văn bản');
+      toast.error("Không thể phân tích văn bản");
     } finally {
       setParsing(false);
     }
@@ -244,12 +316,14 @@ export function AiChat() {
         date: parsedTx.date,
         type: parsedTx.type,
       });
-      toast.success(`Đã lưu ${parsedTx.type === 'income' ? 'thu nhập' : 'chi tiêu'}: ${formatCurrency(parsedTx.amount)}`);
+      toast.success(
+        `Đã lưu ${parsedTx.type === "income" ? "thu nhập" : "chi tiêu"}: ${formatCurrency(parsedTx.amount)}`,
+      );
       setParsedTx(null);
       // Notify other pages to refresh data
-      window.dispatchEvent(new CustomEvent('transaction-created'));
+      window.dispatchEvent(new CustomEvent("transaction-created"));
     } catch {
-      toast.error('Không thể lưu giao dịch');
+      toast.error("Không thể lưu giao dịch");
     } finally {
       setConfirming(false);
     }
@@ -265,10 +339,62 @@ export function AiChat() {
     }
   };
 
+  const handleCopy = async (text: string, idx: number) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
+
+  const handleRetry = async (msgIndex: number) => {
+    // Find the user message before this assistant message
+    let userMsg = "";
+    for (let i = msgIndex - 1; i >= 0; i--) {
+      if (messages[i].role === "user") {
+        userMsg = messages[i].content;
+        break;
+      }
+    }
+    if (!userMsg || loading) return;
+
+    // Remove the error assistant message
+    setMessages((prev) => prev.filter((_, i) => i !== msgIndex));
+    setLoading(true);
+    setStreamingContent("");
+
+    try {
+      let accumulated = "";
+      await aiApi.chatStream(
+        userMsg,
+        (chunk) => {
+          accumulated += chunk;
+          setStreamingContent(accumulated);
+        },
+        () => {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: accumulated },
+          ]);
+          setStreamingContent("");
+          setLoading(false);
+        },
+      );
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại sau.",
+        },
+      ]);
+      setStreamingContent("");
+      setLoading(false);
+    }
+  };
+
   const suggestedQuestions = [
-    'Tôi chi tiêu nhiều nhất vào gì?',
-    'Làm sao để tiết kiệm hơn?',
-    'Phân tích chi tiêu tháng này',
+    "Tôi chi tiêu nhiều nhất vào gì?",
+    "Làm sao để tiết kiệm hơn?",
+    "Phân tích chi tiêu tháng này",
   ];
 
   return (
@@ -278,14 +404,16 @@ export function AiChat() {
         type="button"
         onClick={() => setIsOpen(true)}
         className={cn(
-          'fixed bottom-6 right-6 w-14 h-14 rounded-2xl z-50',
-          'bg-gradient-to-br from-primary-500 to-primary-600',
-          'text-white shadow-lg shadow-primary-500/30',
-          'hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105',
-          'active:scale-95',
-          'transition-all duration-200',
-          'flex items-center justify-center',
-          isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'
+          "fixed bottom-6 right-6 w-14 h-14 rounded-2xl z-50",
+          "bg-gradient-to-br from-primary-500 to-primary-600",
+          "text-white shadow-lg shadow-primary-500/30",
+          "hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105",
+          "active:scale-95",
+          "transition-all duration-200",
+          "flex items-center justify-center",
+          isOpen
+            ? "scale-0 opacity-0 pointer-events-none"
+            : "scale-100 opacity-100",
         )}
         title="Mở trợ lý AI"
       >
@@ -295,8 +423,8 @@ export function AiChat() {
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-opacity duration-300',
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          "fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
         )}
         onClick={() => setIsOpen(false)}
       />
@@ -304,10 +432,10 @@ export function AiChat() {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white dark:bg-[#1a1a1a] z-50 flex flex-col',
-          'shadow-2xl border-l border-gray-200/50 dark:border-[#303030]',
-          'transition-transform duration-300 ease-out',
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          "fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white dark:bg-[#1a1a1a] z-50 flex flex-col",
+          "shadow-2xl border-l border-gray-200/50 dark:border-[#303030]",
+          "transition-transform duration-300 ease-out",
+          isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         {/* Header */}
@@ -342,28 +470,65 @@ export function AiChat() {
         </div>
 
         {/* Messages */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 dark:bg-[#121212]">
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 dark:bg-[#121212]"
+        >
           {messages.map((msg, i) => {
-            const chartData = msg.role === 'assistant' ? extractChartData(msg.content) : [];
+            const chartData =
+              msg.role === "assistant" ? extractChartData(msg.content) : [];
             return (
               <div
                 key={i}
                 className={cn(
-                  'flex',
-                  msg.role === 'user' ? 'justify-end' : 'justify-start'
+                  "flex",
+                  msg.role === "user" ? "justify-end" : "justify-start",
                 )}
               >
                 <div
                   className={cn(
-                    'max-w-[85%] rounded-2xl px-4 py-3',
-                    msg.role === 'user'
-                      ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-sm'
-                      : 'bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 rounded-bl-md shadow-sm border border-gray-100 dark:border-[#303030]'
+                    "max-w-[85%] rounded-2xl px-4 py-3",
+                    msg.role === "user"
+                      ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-sm"
+                      : "bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 rounded-bl-md shadow-sm border border-gray-100 dark:border-[#303030]",
                   )}
                 >
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                    {msg.content}
-                  </p>
+                  {msg.role === "assistant" ? (
+                    <>
+                      <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-table:my-2">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                      <div className="flex items-center gap-1 mt-2 -mb-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(msg.content, i)}
+                          className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#303030] transition-colors"
+                          title="Sao chép"
+                        >
+                          {copiedIdx === i ? (
+                            <CheckCheck size={13} />
+                          ) : (
+                            <Copy size={13} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRetry(i)}
+                          disabled={loading}
+                          className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#303030] transition-colors disabled:opacity-50"
+                          title="Thử lại"
+                        >
+                          <RefreshCw size={13} />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                      {msg.content}
+                    </p>
+                  )}
                   {chartData.length > 0 && <MiniChart data={chartData} />}
                 </div>
               </div>
@@ -371,27 +536,37 @@ export function AiChat() {
           })}
 
           {/* Streaming response */}
-          {streamingContent && (() => {
-            const streamChartData = extractChartData(streamingContent);
-            return (
-              <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 shadow-sm border border-gray-100 dark:border-[#303030]">
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                    {streamingContent}
-                    <span className="inline-block w-1.5 h-4 bg-primary-500 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
-                  </p>
-                  {streamChartData.length > 0 && <MiniChart data={streamChartData} />}
+          {streamingContent &&
+            (() => {
+              const streamChartData = extractChartData(streamingContent);
+              return (
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 shadow-sm border border-gray-100 dark:border-[#303030]">
+                    <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-table:my-2">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {streamingContent}
+                      </ReactMarkdown>
+                      <span className="inline-block w-1.5 h-4 bg-primary-500 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
+                    </div>
+                    {streamChartData.length > 0 && (
+                      <MiniChart data={streamChartData} />
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
           {loading && !streamingContent && (
             <div className="flex justify-start">
               <div className="bg-white dark:bg-[#252525] rounded-2xl rounded-bl-md px-4 py-3 shadow-sm border border-gray-100 dark:border-[#303030]">
                 <div className="flex items-center gap-2">
-                  <Loader2 size={16} className="animate-spin text-primary-500" />
-                  <span className="text-sm text-gray-500">Đang suy nghĩ...</span>
+                  <Loader2
+                    size={16}
+                    className="animate-spin text-primary-500"
+                  />
+                  <span className="text-sm text-gray-500">
+                    Đang suy nghĩ...
+                  </span>
                 </div>
               </div>
             </div>
@@ -400,33 +575,57 @@ export function AiChat() {
           {/* Parsed Transaction Preview */}
           {parsedTx && (
             <div className="bg-white dark:bg-[#252525] rounded-2xl p-4 shadow-sm border border-primary-200 dark:border-primary-800">
-              <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wide mb-3">Xác nhận giao dịch</p>
+              <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wide mb-3">
+                Xác nhận giao dịch
+              </p>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Loại</span>
-                  <span className={cn('font-semibold', parsedTx.type === 'income' ? 'text-emerald-600' : 'text-red-600')}>
-                    {parsedTx.type === 'income' ? 'Thu nhập' : 'Chi tiêu'}
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      parsedTx.type === "income"
+                        ? "text-emerald-600"
+                        : "text-red-600",
+                    )}
+                  >
+                    {parsedTx.type === "income" ? "Thu nhập" : "Chi tiêu"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Số tiền</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(parsedTx.amount)}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    Số tiền
+                  </span>
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(parsedTx.amount)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Danh mục</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    Danh mục
+                  </span>
                   <span className="text-gray-900 dark:text-white">
-                    {(parsedTx.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)[parsedTx.category] || parsedTx.category}
+                    {(parsedTx.type === "income"
+                      ? INCOME_CATEGORIES
+                      : EXPENSE_CATEGORIES)[parsedTx.category] ||
+                      parsedTx.category}
                   </span>
                 </div>
                 {parsedTx.description && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500 dark:text-gray-400">Mô tả</span>
-                    <span className="text-gray-900 dark:text-white">{parsedTx.description}</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Mô tả
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {parsedTx.description}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Ngày</span>
-                  <span className="text-gray-900 dark:text-white">{parsedTx.date}</span>
+                  <span className="text-gray-900 dark:text-white">
+                    {parsedTx.date}
+                  </span>
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
@@ -436,7 +635,11 @@ export function AiChat() {
                   disabled={confirming}
                   className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium transition disabled:opacity-50"
                 >
-                  {confirming ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                  {confirming ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Check size={14} />
+                  )}
                   Lưu
                 </button>
                 <button
@@ -463,11 +666,11 @@ export function AiChat() {
                   type="button"
                   onClick={() => setInput(q)}
                   className={cn(
-                    'block w-full text-left text-sm px-4 py-3',
-                    'bg-white dark:bg-[#252525] hover:bg-primary-50 dark:hover:bg-primary-900/20',
-                    'rounded-xl text-gray-700 dark:text-gray-300 transition-all duration-150',
-                    'border border-gray-100 dark:border-[#303030] hover:border-primary-200 dark:hover:border-primary-700',
-                    'hover:text-primary-700 dark:hover:text-primary-400'
+                    "block w-full text-left text-sm px-4 py-3",
+                    "bg-white dark:bg-[#252525] hover:bg-primary-50 dark:hover:bg-primary-900/20",
+                    "rounded-xl text-gray-700 dark:text-gray-300 transition-all duration-150",
+                    "border border-gray-100 dark:border-[#303030] hover:border-primary-200 dark:hover:border-primary-700",
+                    "hover:text-primary-700 dark:hover:text-primary-400",
                   )}
                 >
                   {q}
@@ -487,26 +690,36 @@ export function AiChat() {
           <div className="relative flex items-center gap-2">
             <div
               className={cn(
-                'absolute -inset-0.5 rounded-2xl opacity-0 blur transition-all duration-300',
-                isFocused && 'opacity-100 bg-primary-400/20'
+                "absolute -inset-0.5 rounded-2xl opacity-0 blur transition-all duration-300",
+                isFocused && "opacity-100 bg-primary-400/20",
               )}
             />
-            <div className="relative flex-1">
-              <input
-                type="text"
+            <div className="relative flex-1 flex items-center">
+              <textarea
+                ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    if (input.trim() && !loading && !parsing) {
+                      handleSubmit(e as unknown as React.FormEvent);
+                    }
+                  }
+                }}
                 placeholder='Hỏi hoặc nhập "Ăn phở 45k"...'
+                rows={1}
                 className={cn(
-                  'w-full px-4 py-3 text-sm text-gray-800 dark:text-gray-100 font-medium rounded-2xl',
-                  'bg-white dark:bg-[#252525] border-2 border-gray-200 dark:border-[#404040]',
-                  'placeholder:text-gray-400 placeholder:font-normal',
-                  'hover:border-gray-300 dark:hover:border-[#505050]',
-                  'focus:outline-none focus:bg-white dark:focus:bg-[#252525] focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10',
-                  'transition-all duration-200',
-                  'disabled:opacity-60 disabled:bg-gray-50 dark:disabled:bg-[#1a1a1a]'
+                  "w-full px-4 py-3 text-sm text-gray-800 dark:text-gray-100 font-medium rounded-2xl",
+                  "bg-white dark:bg-[#252525] border-2 border-gray-200 dark:border-[#404040]",
+                  "placeholder:text-gray-400 placeholder:font-normal",
+                  "hover:border-gray-300 dark:hover:border-[#505050]",
+                  "focus:outline-none focus:bg-white dark:focus:bg-[#252525] focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10",
+                  "transition-all duration-200",
+                  "disabled:opacity-60 disabled:bg-gray-50 dark:disabled:bg-[#1a1a1a]",
+                  "resize-none max-h-32 overflow-hidden min-h-[44px] field-sizing-content break-all",
                 )}
                 disabled={loading || parsing}
               />
@@ -517,27 +730,31 @@ export function AiChat() {
               onClick={handleParse}
               disabled={loading || parsing || !input.trim()}
               className={cn(
-                'relative p-3 rounded-2xl transition-all duration-200',
-                'bg-gradient-to-br from-amber-500 to-orange-500',
-                'text-white shadow-md shadow-amber-500/25',
-                'hover:shadow-lg hover:shadow-amber-500/30',
-                'active:scale-95',
-                'disabled:opacity-50 disabled:active:scale-100'
+                "relative p-3 rounded-2xl transition-all duration-200",
+                "bg-gradient-to-br from-amber-500 to-orange-500",
+                "text-white shadow-md shadow-amber-500/25",
+                "hover:shadow-lg hover:shadow-amber-500/30",
+                "active:scale-95",
+                "disabled:opacity-50 disabled:active:scale-100",
               )}
               title="Nhập nhanh giao dịch"
             >
-              {parsing ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+              {parsing ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Zap size={18} />
+              )}
             </button>
             <button
               type="submit"
               disabled={loading || !input.trim()}
               className={cn(
-                'relative p-3 rounded-2xl transition-all duration-200',
-                'bg-gradient-to-br from-primary-500 to-primary-600',
-                'text-white shadow-md shadow-primary-500/25',
-                'hover:shadow-lg hover:shadow-primary-500/30',
-                'active:scale-95',
-                'disabled:opacity-50 disabled:active:scale-100'
+                "relative p-3 rounded-2xl transition-all duration-200",
+                "bg-gradient-to-br from-primary-500 to-primary-600",
+                "text-white shadow-md shadow-primary-500/25",
+                "hover:shadow-lg hover:shadow-primary-500/30",
+                "active:scale-95",
+                "disabled:opacity-50 disabled:active:scale-100",
               )}
               title="Gửi"
             >

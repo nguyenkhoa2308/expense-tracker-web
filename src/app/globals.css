@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -625,3 +626,4 @@ body {
 .ant-picker-dropdown .ant-picker-cell-disabled::before {
   background: transparent !important;
 }
+

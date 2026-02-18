@@ -17,10 +17,11 @@ export interface ParsedTransaction {
 export const aiApi = {
   // Streaming chat via SSE
   chatStream: async (message: string, onChunk: (text: string) => void, onDone: () => void) => {
-    const baseUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001');
+    // Gọi thẳng BE, không qua Next.js rewrite vì rewrite buffer response → mất streaming
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     const token = getAccessToken();
 
-    const res = await fetch(`${baseUrl}/ai/chat`, {
+    const res = await fetch(`${baseUrl}/api/ai/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
