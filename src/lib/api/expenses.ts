@@ -42,4 +42,10 @@ export const expenseApi = {
       params,
       responseType: 'blob',
     }),
+
+  exportPdf: (params?: PaginationParams) =>
+    api.get('/expenses/export/pdf', {
+      params,
+      responseType: 'blob',
+    }),
 };

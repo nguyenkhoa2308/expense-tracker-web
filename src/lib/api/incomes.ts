@@ -42,4 +42,10 @@ export const incomeApi = {
       params,
       responseType: 'blob',
     }),
+
+  exportPdf: (params?: PaginationParams) =>
+    api.get('/incomes/export/pdf', {
+      params,
+      responseType: 'blob',
+    }),
 };

@@ -380,6 +380,33 @@ export default function ReportsPage() {
       .slice(0, 15);
   }, [currentExpenses, currentIncomes]);
 
+  // Export to PDF
+  const exportToPDF = async () => {
+    try {
+      const params: Record<string, string> = {};
+      const { start, end } = getDateRange(period);
+      params.dateFrom = format(start, "yyyy-MM-dd");
+      params.dateTo = format(end, "yyyy-MM-dd");
+
+      const [expRes, incRes] = await Promise.all([
+        expenseApi.exportPdf(params),
+        incomeApi.exportPdf(params),
+      ]);
+
+      // Open expense PDF in new tab for preview
+      const expBlob = new Blob([expRes.data], { type: "application/pdf" });
+      const expUrl = URL.createObjectURL(expBlob);
+      window.open(expUrl, "_blank");
+
+      // Open income PDF in new tab for preview
+      const incBlob = new Blob([incRes.data], { type: "application/pdf" });
+      const incUrl = URL.createObjectURL(incBlob);
+      setTimeout(() => window.open(incUrl, "_blank"), 300);
+    } catch {
+      // Failed to export PDF
+    }
+  };
+
   // Export to CSV
   const exportToCSV = () => {
     const headers = ["Ngày", "Loại", "Danh mục", "Mô tả", "Số tiền", "Nguồn"];
@@ -617,14 +644,24 @@ export default function ReportsPage() {
                 Thu nhập, chi tiêu và xu hướng tài chính
               </p>
             </div>
-            <button
-              type="button"
-              onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition shadow-sm"
-            >
-              <Download size={18} />
-              Xuất CSV
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={exportToCSV}
+                className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition shadow-sm"
+              >
+                <Download size={18} />
+                CSV
+              </button>
+              <button
+                type="button"
+                onClick={exportToPDF}
+                className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition shadow-sm"
+              >
+                <Download size={18} />
+                PDF
+              </button>
+            </div>
           </div>
 
           {/* Period Selector */}

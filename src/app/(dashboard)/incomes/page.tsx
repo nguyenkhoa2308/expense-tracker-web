@@ -310,6 +310,27 @@ export default function IncomesPage() {
     }
   };
 
+  const handleExportPdf = async () => {
+    setExporting(true);
+    try {
+      const params: PaginationParams = {
+        ...(filterCategory && { category: filterCategory }),
+        ...(dateFrom && { dateFrom }),
+        ...(dateTo && { dateTo }),
+        ...(debouncedAmountMin && { amountMin: Number(debouncedAmountMin) }),
+        ...(debouncedAmountMax && { amountMax: Number(debouncedAmountMax) }),
+      };
+      const res = await incomeApi.exportPdf(params);
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch {
+      toast.error("Không thể xuất PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -429,7 +450,16 @@ export default function IncomesPage() {
               loading={exporting}
               disabled={exporting}
             >
-              Xuất CSV
+              CSV
+            </Button>
+            <Button
+              onClick={handleExportPdf}
+              leftIcon={<Download size={18} />}
+              variant="secondary"
+              loading={exporting}
+              disabled={exporting}
+            >
+              PDF
             </Button>
             <Button
               onClick={() => setShowForm(!showForm)}
