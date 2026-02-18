@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Loader2, X, Send, Sparkles, Trash2, Zap, Check, XIcon } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { aiApi, ChatMessage, ParsedTransaction } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useToastStore } from '@/store';
@@ -18,6 +19,61 @@ const INCOME_CATEGORIES: Record<string, string> = {
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+const CHART_COLORS = ['#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#10B981', '#3B82F6', '#F59E0B', '#EF4444'];
+
+// Parse AI message for category data (e.g. "- Ăn uống: 2.000.000 ₫ (45%)")
+function extractChartData(text: string): { name: string; value: number }[] {
+  const lines = text.split('\n');
+  const data: { name: string; value: number }[] = [];
+
+  for (const line of lines) {
+    // Match patterns like: "- Ăn uống: 2.000.000 ₫ (45%)" or "- **Ăn uống** (45%)" or "- Ăn uống (45%)"
+    const match = line.match(/[-•]\s*\*{0,2}([^*:(\n]+?)\*{0,2}\s*(?::[^(]*?)?\((\d+(?:[.,]\d+)?)%\)/);
+    if (match) {
+      const name = match[1].trim();
+      const value = parseFloat(match[2].replace(',', '.'));
+      if (value > 0 && name.length > 1 && name.length < 30) {
+        data.push({ name, value });
+      }
+    }
+  }
+
+  return data.length >= 2 ? data : [];
+}
+
+function MiniChart({ data }: { data: { name: string; value: number }[] }) {
+  return (
+    <div className="mt-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl p-3 border border-gray-100 dark:border-[#303030]">
+      <ResponsiveContainer width="100%" height={160}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={30}
+            outerRadius={55}
+            paddingAngle={3}
+            dataKey="value"
+          >
+            {data.map((_, index) => (
+              <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value: number) => `${value}%`} />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="flex flex-wrap gap-1.5 mt-1">
+        {data.map((item, i) => (
+          <span key={i} className="flex items-center gap-1 text-[10px] text-gray-600 dark:text-gray-400">
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+            {item.name}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Detect if text looks like a transaction (has amount pattern)
 function looksLikeTransaction(text: string): boolean {
@@ -287,40 +343,48 @@ export function AiChat() {
 
         {/* Messages */}
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 dark:bg-[#121212]">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={cn(
-                'flex',
-                msg.role === 'user' ? 'justify-end' : 'justify-start'
-              )}
-            >
+          {messages.map((msg, i) => {
+            const chartData = msg.role === 'assistant' ? extractChartData(msg.content) : [];
+            return (
               <div
+                key={i}
                 className={cn(
-                  'max-w-[85%] rounded-2xl px-4 py-3',
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-sm'
-                    : 'bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 rounded-bl-md shadow-sm border border-gray-100 dark:border-[#303030]'
+                  'flex',
+                  msg.role === 'user' ? 'justify-end' : 'justify-start'
                 )}
               >
-                <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                  {msg.content}
-                </p>
+                <div
+                  className={cn(
+                    'max-w-[85%] rounded-2xl px-4 py-3',
+                    msg.role === 'user'
+                      ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-br-md shadow-sm'
+                      : 'bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 rounded-bl-md shadow-sm border border-gray-100 dark:border-[#303030]'
+                  )}
+                >
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                    {msg.content}
+                  </p>
+                  {chartData.length > 0 && <MiniChart data={chartData} />}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Streaming response */}
-          {streamingContent && (
-            <div className="flex justify-start">
-              <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 shadow-sm border border-gray-100 dark:border-[#303030]">
-                <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                  {streamingContent}
-                  <span className="inline-block w-1.5 h-4 bg-primary-500 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
-                </p>
+          {streamingContent && (() => {
+            const streamChartData = extractChartData(streamingContent);
+            return (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white dark:bg-[#252525] text-gray-900 dark:text-gray-100 shadow-sm border border-gray-100 dark:border-[#303030]">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                    {streamingContent}
+                    <span className="inline-block w-1.5 h-4 bg-primary-500 animate-pulse ml-0.5 align-text-bottom rounded-sm" />
+                  </p>
+                  {streamChartData.length > 0 && <MiniChart data={streamChartData} />}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {loading && !streamingContent && (
             <div className="flex justify-start">
