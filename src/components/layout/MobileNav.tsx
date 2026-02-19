@@ -7,7 +7,6 @@ import {
   Wallet,
   Receipt,
   PiggyBank,
-  FileBarChart,
   CalendarClock,
 } from 'lucide-react';
 
@@ -17,7 +16,7 @@ const navItems = [
   { href: '/expenses', label: 'Chi tiêu', icon: Receipt },
   { href: '/budget', label: 'Ngân sách', icon: PiggyBank },
   { href: '/recurring', label: 'Định kỳ', icon: CalendarClock },
-  { href: '/reports', label: 'Báo cáo', icon: FileBarChart },
+  // { href: '/reports', label: 'Báo cáo', icon: FileBarChart },
 ];
 
 export function MobileNav() {

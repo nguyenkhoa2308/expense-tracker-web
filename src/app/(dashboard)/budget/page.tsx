@@ -14,6 +14,7 @@ import {
 import { Plus, X, Pencil, Trash2, Wallet } from "lucide-react";
 import { useToastStore } from "@/store";
 import { AnimatedCurrency } from "@/components/AnimatedCurrency";
+import { ChartReveal, SkeletonTransition } from "@/components/motion";
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { DatePicker as AntDatePicker, ConfigProvider } from "antd";
 import dayjs from "dayjs";
@@ -216,79 +217,77 @@ export default function BudgetPage() {
     itemStyle: { color: "#d4d4d4", fontSize: "13px", padding: "2px 0" },
   };
 
-  if (showSkeleton) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6 animate-pulse">
-          {/* Header skeleton */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="h-7 skeleton rounded w-40 mb-2" />
-              <div className="h-4 skeleton rounded w-64" />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="h-11 skeleton rounded-2xl w-44" />
-              <div className="h-11 skeleton rounded-2xl w-24" />
-            </div>
-          </div>
-
-          {/* Stat cards skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="skeleton-card rounded-2xl p-5 border">
-                <div className="h-4 skeleton rounded w-24 mb-2" />
-                <div className="h-7 skeleton rounded w-32 mb-2" />
-                <div className="h-4 skeleton rounded w-20" />
+  return (
+    <DashboardLayout>
+      <SkeletonTransition
+        loading={showSkeleton}
+        skeleton={
+          <div className="space-y-6 animate-pulse">
+            {/* Header skeleton */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="h-7 skeleton rounded w-40 mb-2" />
+                <div className="h-4 skeleton rounded w-64" />
               </div>
-            ))}
-          </div>
-
-          {/* Charts skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="skeleton-card rounded-2xl border p-6">
-              <div className="h-5 skeleton rounded w-48 mb-4" />
-              <div className="flex items-center justify-center h-[220px]">
-                <div className="w-[180px] h-[180px] rounded-full border-[20px] skeleton" />
+              <div className="flex items-center gap-3">
+                <div className="h-11 skeleton rounded-2xl w-44" />
+                <div className="h-11 skeleton rounded-2xl w-24" />
               </div>
             </div>
-            <div className="skeleton-card rounded-2xl border p-6">
-              <div className="h-5 skeleton rounded w-32 mb-4" />
-              <div className="flex items-center justify-center h-[220px]">
-                <div className="w-[180px] h-[180px] rounded-full border-[20px] skeleton" />
-              </div>
-            </div>
-          </div>
 
-          {/* Budget list skeleton */}
-          <div className="skeleton-card rounded-2xl border overflow-hidden">
-            <div className="p-5 border-b border-gray-100">
-              <div className="h-5 skeleton rounded w-40" />
-            </div>
-            <div className="p-6 space-y-5">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 skeleton rounded-xl" />
-                      <div>
-                        <div className="h-4 skeleton rounded w-24 mb-1" />
-                        <div className="h-3 skeleton rounded w-32" />
-                      </div>
-                    </div>
-                    <div className="h-5 skeleton rounded w-16" />
-                  </div>
-                  <div className="h-2.5 skeleton rounded-full w-full" />
+            {/* Stat cards skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton-card rounded-2xl p-5 border">
+                  <div className="h-4 skeleton rounded w-24 mb-2" />
+                  <div className="h-7 skeleton rounded w-32 mb-2" />
+                  <div className="h-4 skeleton rounded w-20" />
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
-  return (
-    <DashboardLayout>
+            {/* Charts skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="skeleton-card rounded-2xl border p-6">
+                <div className="h-5 skeleton rounded w-48 mb-4" />
+                <div className="flex items-center justify-center h-[220px]">
+                  <div className="w-[180px] h-[180px] rounded-full border-[20px] skeleton" />
+                </div>
+              </div>
+              <div className="skeleton-card rounded-2xl border p-6">
+                <div className="h-5 skeleton rounded w-32 mb-4" />
+                <div className="flex items-center justify-center h-[220px]">
+                  <div className="w-[180px] h-[180px] rounded-full border-[20px] skeleton" />
+                </div>
+              </div>
+            </div>
+
+            {/* Budget list skeleton */}
+            <div className="skeleton-card rounded-2xl border overflow-hidden">
+              <div className="p-5 border-b border-gray-100">
+                <div className="h-5 skeleton rounded w-40" />
+              </div>
+              <div className="p-6 space-y-5">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 skeleton rounded-xl" />
+                        <div>
+                          <div className="h-4 skeleton rounded w-24 mb-1" />
+                          <div className="h-3 skeleton rounded w-32" />
+                        </div>
+                      </div>
+                      <div className="h-5 skeleton rounded w-16" />
+                    </div>
+                    <div className="h-2.5 skeleton rounded-full w-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        }
+      >
       <div className="space-y-6 pb-20">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -435,30 +434,32 @@ export default function BudgetPage() {
                 Tỷ lệ ngân sách theo danh mục
               </p>
               <div className="flex items-center gap-6">
-                <div className="flex-shrink-0">
-                  <ResponsiveContainer width={180} height={180}>
-                    <PieChart>
-                      <Pie
-                        data={allocationData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={55}
-                        outerRadius={80}
-                        paddingAngle={2}
-                        dataKey="value"
-                        strokeWidth={0}
-                      >
-                        {allocationData.map((entry, i) => (
-                          <Cell key={i} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        {...tooltipStyle}
-                        formatter={(value: number) => formatCurrency(value)}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                <ChartReveal delay={0.1}>
+                  <div className="flex-shrink-0">
+                    <ResponsiveContainer width={180} height={180}>
+                      <PieChart>
+                        <Pie
+                          data={allocationData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={55}
+                          outerRadius={80}
+                          paddingAngle={2}
+                          dataKey="value"
+                          strokeWidth={0}
+                        >
+                          {allocationData.map((entry, i) => (
+                            <Cell key={i} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          {...tooltipStyle}
+                          formatter={(value: number) => formatCurrency(value)}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </ChartReveal>
                 <div className="flex-1 space-y-2">
                   {allocationData.map((item, i) => {
                     const pct =
@@ -492,42 +493,44 @@ export default function BudgetPage() {
               <p className="text-sm text-gray-500 mb-4 self-start">
                 Đã sử dụng ngân sách
               </p>
-              <div className="relative">
-                <ResponsiveContainer width={180} height={180}>
-                  <PieChart>
-                    <Pie
-                      data={donutSummary}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      strokeWidth={0}
-                      startAngle={90}
-                      endAngle={-270}
+              <ChartReveal delay={0.2}>
+                <div className="relative">
+                  <ResponsiveContainer width={180} height={180}>
+                    <PieChart>
+                      <Pie
+                        data={donutSummary}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                        strokeWidth={0}
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        {donutSummary.map((entry, i) => (
+                          <Cell key={i} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span
+                      className={`text-3xl font-bold ${
+                        overallPercentage >= 100
+                          ? "text-red-500"
+                          : overallPercentage >= 80
+                            ? "text-amber-500"
+                            : "text-emerald-500"
+                      }`}
                     >
-                      {donutSummary.map((entry, i) => (
-                        <Cell key={i} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span
-                    className={`text-3xl font-bold ${
-                      overallPercentage >= 100
-                        ? "text-red-500"
-                        : overallPercentage >= 80
-                          ? "text-amber-500"
-                          : "text-emerald-500"
-                    }`}
-                  >
-                    {overallPercentage}%
-                  </span>
-                  <span className="text-xs text-gray-500">đã dùng</span>
+                      {overallPercentage}%
+                    </span>
+                    <span className="text-xs text-gray-500">đã dùng</span>
+                  </div>
                 </div>
-              </div>
+              </ChartReveal>
               <div className="mt-4 w-full space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Đã chi</span>
@@ -650,6 +653,7 @@ export default function BudgetPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
+      </SkeletonTransition>
     </DashboardLayout>
   );
 }

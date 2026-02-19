@@ -1,6 +1,6 @@
 export { api, setAccessToken, getAccessToken } from './client';
 export { authApi } from './auth';
-export type { RefreshResponse } from './auth';
+export type { RefreshResponse, UserProfile } from './auth';
 export { expenseApi } from './expenses';
 export type { Expense, ExpenseStats } from './expenses';
 export { incomeApi } from './incomes';

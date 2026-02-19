@@ -38,6 +38,7 @@ import {
 import { groupTransactionsByDate } from "@/lib/dateGrouping";
 import { useToastStore } from "@/store";
 import { AnimatedCurrency } from "@/components/AnimatedCurrency";
+import { ChartReveal, SkeletonTransition } from "@/components/motion";
 
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -367,74 +368,72 @@ export default function IncomesPage() {
       })
     : [];
 
-  if (showSkeleton) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6 animate-pulse">
-          {/* Header skeleton */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="h-7 skeleton rounded w-32 mb-2" />
-              <div className="h-4 skeleton rounded w-64" />
-            </div>
-            <div className="h-11 skeleton rounded-2xl w-36" />
-          </div>
-
-          {/* Filters skeleton */}
-          <div className="skeleton-card rounded-2xl border p-5">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 h-12 skeleton rounded-2xl" />
-              <div className="sm:w-56 h-12 skeleton rounded-2xl" />
-            </div>
-          </div>
-
-          {/* Stat cards skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="skeleton-card rounded-2xl p-5 border">
-                <div className="h-4 skeleton rounded w-24 mb-2" />
+  return (
+    <DashboardLayout>
+      <SkeletonTransition
+        loading={showSkeleton}
+        skeleton={
+          <div className="space-y-6 animate-pulse">
+            {/* Header skeleton */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
                 <div className="h-7 skeleton rounded w-32 mb-2" />
-                <div className="h-4 skeleton rounded w-20" />
+                <div className="h-4 skeleton rounded w-64" />
               </div>
-            ))}
-          </div>
-
-          {/* Chart skeleton */}
-          <div className="skeleton-card rounded-2xl border p-6">
-            <div className="h-5 skeleton rounded w-32 mb-4" />
-            <div className="flex items-center justify-center h-[250px]">
-              <div className="w-[180px] h-[180px] rounded-full border-[24px] skeleton" />
+              <div className="h-11 skeleton rounded-2xl w-36" />
             </div>
-          </div>
 
-          {/* List skeleton */}
-          <div className="skeleton-card rounded-2xl border overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <div className="h-5 skeleton rounded w-40" />
-              <div className="h-6 skeleton rounded-full w-24" />
+            {/* Filters skeleton */}
+            <div className="skeleton-card rounded-2xl border p-5">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 h-12 skeleton rounded-2xl" />
+                <div className="sm:w-56 h-12 skeleton rounded-2xl" />
+              </div>
             </div>
-            <div className="p-8 space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 skeleton rounded-xl" />
-                    <div>
-                      <div className="h-4 skeleton rounded w-32 mb-2" />
-                      <div className="h-3 skeleton rounded w-20" />
-                    </div>
-                  </div>
-                  <div className="h-4 skeleton rounded w-24" />
+
+            {/* Stat cards skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton-card rounded-2xl p-5 border">
+                  <div className="h-4 skeleton rounded w-24 mb-2" />
+                  <div className="h-7 skeleton rounded w-32 mb-2" />
+                  <div className="h-4 skeleton rounded w-20" />
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
-  return (
-    <DashboardLayout>
+            {/* Chart skeleton */}
+            <div className="skeleton-card rounded-2xl border p-6">
+              <div className="h-5 skeleton rounded w-32 mb-4" />
+              <div className="flex items-center justify-center h-[250px]">
+                <div className="w-[180px] h-[180px] rounded-full border-[24px] skeleton" />
+              </div>
+            </div>
+
+            {/* List skeleton */}
+            <div className="skeleton-card rounded-2xl border overflow-hidden">
+              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                <div className="h-5 skeleton rounded w-40" />
+                <div className="h-6 skeleton rounded-full w-24" />
+              </div>
+              <div className="p-8 space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 skeleton rounded-xl" />
+                      <div>
+                        <div className="h-4 skeleton rounded w-32 mb-2" />
+                        <div className="h-3 skeleton rounded w-20" />
+                      </div>
+                    </div>
+                    <div className="h-4 skeleton rounded w-24" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        }
+      >
       <div className="space-y-6 pb-20">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -700,33 +699,35 @@ export default function IncomesPage() {
               Theo danh mục
             </h2>
             {categoryChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={categoryChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                    strokeWidth={0}
-                  >
-                    {categoryChartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    {...tooltipStyle}
-                    formatter={(value: number) => formatCurrency(value)}
-                  />
-                  <Legend
-                    wrapperStyle={{ fontSize: "12px" }}
-                    iconType="circle"
-                    iconSize={8}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <ChartReveal>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={categoryChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {categoryChartData.map((entry, index) => (
+                        <Cell key={index} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      {...tooltipStyle}
+                      formatter={(value: number) => formatCurrency(value)}
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: "12px" }}
+                      iconType="circle"
+                      iconSize={8}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartReveal>
             ) : (
               <div className="flex items-center justify-center h-[250px]">
                 <p className="text-gray-400 text-sm">
@@ -895,6 +896,7 @@ export default function IncomesPage() {
         onSave={handleEdit}
         onCancel={() => setEditingIncome(null)}
       />
+      </SkeletonTransition>
     </DashboardLayout>
   );
 }

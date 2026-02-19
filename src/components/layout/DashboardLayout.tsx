@@ -7,6 +7,9 @@ import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { MobileNav } from "./MobileNav";
 import { AiChat } from "../AiChat";
+import { ErrorBoundary } from "../ErrorBoundary";
+import { PageTransition } from "../motion";
+import { Onboarding } from "../Onboarding";
 import { ToastContainer } from "../Toast";
 
 interface DashboardLayoutProps {
@@ -95,6 +98,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (!user) return null;
 
+  if (!user.onboarded) {
+    return (
+      <>
+        <Onboarding />
+        <ToastContainer />
+      </>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-[#0f0f0f] overflow-hidden">
       <Header />
@@ -103,7 +115,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <Sidebar />
         </div>
         <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-auto scrollbar-stable">
-          {children}
+          <ErrorBoundary>
+            <PageTransition>{children}</PageTransition>
+          </ErrorBoundary>
         </main>
       </div>
       <MobileNav />

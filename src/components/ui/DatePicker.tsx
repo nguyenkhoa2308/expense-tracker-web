@@ -22,6 +22,7 @@ export interface DatePickerProps {
   id?: string;
   minDate?: string; // ISO date string (YYYY-MM-DD)
   maxDate?: string; // ISO date string (YYYY-MM-DD)
+  allowFuture?: boolean; // default false — set true to allow future dates
 }
 
 export function DatePicker({
@@ -36,6 +37,7 @@ export function DatePicker({
   id,
   minDate,
   maxDate,
+  allowFuture = false,
 }: DatePickerProps) {
   const [isFocused, setIsFocused] = useState(false);
   const pickerId = id || label?.toLowerCase().replace(/\s/g, '-');
@@ -82,7 +84,7 @@ export function DatePicker({
           suffixIcon={<Calendar size={18} />}
           allowClear={false}
           minDate={minDate ? dayjs(minDate) : undefined}
-          maxDate={maxDate ? dayjs(maxDate) : dayjs()}
+          maxDate={maxDate ? dayjs(maxDate) : allowFuture ? undefined : dayjs()}
           placement="bottomRight"
           styles={{ popup: { root: { zIndex: 99999 } } }}
           className="ant-datepicker-custom"

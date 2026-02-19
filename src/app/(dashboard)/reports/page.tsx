@@ -32,6 +32,7 @@ import {
 import { subDays, startOfMonth, endOfMonth, format, subMonths } from "date-fns";
 import { vi } from "date-fns/locale";
 import { AnimatedCurrency } from "@/components/AnimatedCurrency";
+import { ChartReveal, SkeletonTransition } from "@/components/motion";
 
 const EXPENSE_COLORS = [
   "#EF4444",
@@ -446,192 +447,190 @@ export default function ReportsPage() {
     link.click();
   };
 
-  if (showSkeleton) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6 animate-pulse">
-          {/* Header skeleton */}
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="h-7 skeleton rounded w-48 mb-2" />
-                <div className="h-4 skeleton rounded w-64" />
-              </div>
-              <div className="h-10 skeleton rounded-lg w-28" />
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex gap-2 skeleton-card rounded-lg p-1 shadow-sm border">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-8 skeleton rounded-md w-16" />
-                ))}
-              </div>
-              <div className="flex gap-2 sm:ml-auto">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-9 skeleton rounded-lg w-24" />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Stat cards skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="skeleton-card rounded-xl shadow-sm border p-5"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="h-4 skeleton rounded w-20" />
-                  <div className="w-5 h-5 skeleton rounded" />
+  return (
+    <DashboardLayout>
+      <SkeletonTransition
+        loading={showSkeleton}
+        skeleton={
+          <div className="space-y-6 animate-pulse">
+            {/* Header skeleton */}
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <div className="h-7 skeleton rounded w-48 mb-2" />
+                  <div className="h-4 skeleton rounded w-64" />
                 </div>
-                <div className="h-7 skeleton rounded w-28 mb-2" />
-                <div className="h-4 skeleton rounded w-36" />
+                <div className="h-10 skeleton rounded-lg w-28" />
               </div>
-            ))}
-          </div>
-
-          {/* Insights skeleton */}
-          <div className="skeleton-light rounded-xl p-5 border border-gray-200 dark:border-[#303030]">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-5 skeleton rounded" />
-              <div className="h-4 skeleton rounded w-28" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex gap-2 skeleton-card rounded-lg p-1 shadow-sm border">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-8 skeleton rounded-md w-16" />
+                  ))}
+                </div>
+                <div className="flex gap-2 sm:ml-auto">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-9 skeleton rounded-lg w-24" />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-3">
+
+            {/* Stat cards skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-8 skeleton rounded-lg w-40" />
+                <div
+                  key={i}
+                  className="skeleton-card rounded-xl shadow-sm border p-5"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="h-4 skeleton rounded w-20" />
+                    <div className="w-5 h-5 skeleton rounded" />
+                  </div>
+                  <div className="h-7 skeleton rounded w-28 mb-2" />
+                  <div className="h-4 skeleton rounded w-36" />
+                </div>
+              ))}
+            </div>
+
+            {/* Insights skeleton */}
+            <div className="skeleton-light rounded-xl p-5 border border-gray-200 dark:border-[#303030]">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-5 h-5 skeleton rounded" />
+                <div className="h-4 skeleton rounded w-28" />
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-8 skeleton rounded-lg w-40" />
+                ))}
+              </div>
+            </div>
+
+            {/* Area chart skeleton */}
+            <div className="skeleton-card rounded-xl shadow-sm border p-6">
+              <div className="h-5 skeleton rounded w-44 mb-4" />
+              <div className="h-[300px] flex items-end gap-1">
+                <div className="flex-1 skeleton-light rounded-t h-1/4" />
+                <div className="flex-1 skeleton-light rounded-t h-2/5" />
+                <div className="flex-1 skeleton-light rounded-t h-1/3" />
+                <div className="flex-1 skeleton-light rounded-t h-3/5" />
+                <div className="flex-1 skeleton-light rounded-t h-1/2" />
+                <div className="flex-1 skeleton-light rounded-t h-2/3" />
+                <div className="flex-1 skeleton-light rounded-t h-2/5" />
+                <div className="flex-1 skeleton-light rounded-t h-4/5" />
+                <div className="flex-1 skeleton-light rounded-t h-3/5" />
+                <div className="flex-1 skeleton-light rounded-t h-1/2" />
+                <div className="flex-1 skeleton-light rounded-t h-3/4" />
+                <div className="flex-1 skeleton-light rounded-t h-2/5" />
+                <div className="flex-1 skeleton-light rounded-t h-[90%]" />
+                <div className="flex-1 skeleton-light rounded-t h-3/5" />
+                <div className="flex-1 skeleton-light rounded-t h-1/3" />
+                <div className="flex-1 skeleton-light rounded-t h-1/2" />
+                <div className="flex-1 skeleton-light rounded-t h-2/3" />
+                <div className="flex-1 skeleton-light rounded-t h-2/5" />
+                <div className="flex-1 skeleton-light rounded-t h-3/4" />
+                <div className="flex-1 skeleton-light rounded-t h-1/2" />
+              </div>
+            </div>
+
+            {/* Pie charts skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="skeleton-card rounded-xl shadow-sm border p-6"
+                >
+                  <div className="h-5 skeleton rounded w-40 mb-4" />
+                  <div className="flex items-center justify-center h-[280px]">
+                    <div className="w-[180px] h-[180px] rounded-full border-[24px] skeleton" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Monthly comparison skeleton */}
+            <div className="skeleton-card rounded-xl shadow-sm border p-6">
+              <div className="h-5 skeleton rounded w-48 mb-4" />
+              <div className="flex items-end gap-4 h-[280px] pt-8">
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-2/5" />
+                  <div className="flex-1 skeleton-light rounded-t h-1/4" />
+                </div>
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-3/5" />
+                  <div className="flex-1 skeleton-light rounded-t h-2/5" />
+                </div>
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-4/5" />
+                  <div className="flex-1 skeleton-light rounded-t h-3/5" />
+                </div>
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-1/2" />
+                  <div className="flex-1 skeleton-light rounded-t h-1/3" />
+                </div>
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-3/4" />
+                  <div className="flex-1 skeleton-light rounded-t h-1/2" />
+                </div>
+                <div className="flex-1 flex gap-1 items-end">
+                  <div className="flex-1 skeleton rounded-t h-[90%]" />
+                  <div className="flex-1 skeleton-light rounded-t h-3/4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Category progress bars skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {[...Array(2)].map((_, i) => (
+                <div
+                  key={i}
+                  className="skeleton-card rounded-xl shadow-sm border p-6"
+                >
+                  <div className="h-5 skeleton rounded w-40 mb-4" />
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-1.5">
+                        <div className="h-4 skeleton rounded w-20" />
+                        <div className="h-4 skeleton rounded w-24" />
+                      </div>
+                      <div className="w-full skeleton-light rounded-full h-2">
+                        <div className="skeleton h-2 rounded-full w-4/5" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1.5">
+                        <div className="h-4 skeleton rounded w-20" />
+                        <div className="h-4 skeleton rounded w-24" />
+                      </div>
+                      <div className="w-full skeleton-light rounded-full h-2">
+                        <div className="skeleton h-2 rounded-full w-3/5" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1.5">
+                        <div className="h-4 skeleton rounded w-20" />
+                        <div className="h-4 skeleton rounded w-24" />
+                      </div>
+                      <div className="w-full skeleton-light rounded-full h-2">
+                        <div className="skeleton h-2 rounded-full w-2/5" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1.5">
+                        <div className="h-4 skeleton rounded w-20" />
+                        <div className="h-4 skeleton rounded w-24" />
+                      </div>
+                      <div className="w-full skeleton-light rounded-full h-2">
+                        <div className="skeleton h-2 rounded-full w-1/4" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-
-          {/* Area chart skeleton */}
-          <div className="skeleton-card rounded-xl shadow-sm border p-6">
-            <div className="h-5 skeleton rounded w-44 mb-4" />
-            <div className="h-[300px] flex items-end gap-1">
-              <div className="flex-1 skeleton-light rounded-t h-1/4" />
-              <div className="flex-1 skeleton-light rounded-t h-2/5" />
-              <div className="flex-1 skeleton-light rounded-t h-1/3" />
-              <div className="flex-1 skeleton-light rounded-t h-3/5" />
-              <div className="flex-1 skeleton-light rounded-t h-1/2" />
-              <div className="flex-1 skeleton-light rounded-t h-2/3" />
-              <div className="flex-1 skeleton-light rounded-t h-2/5" />
-              <div className="flex-1 skeleton-light rounded-t h-4/5" />
-              <div className="flex-1 skeleton-light rounded-t h-3/5" />
-              <div className="flex-1 skeleton-light rounded-t h-1/2" />
-              <div className="flex-1 skeleton-light rounded-t h-3/4" />
-              <div className="flex-1 skeleton-light rounded-t h-2/5" />
-              <div className="flex-1 skeleton-light rounded-t h-[90%]" />
-              <div className="flex-1 skeleton-light rounded-t h-3/5" />
-              <div className="flex-1 skeleton-light rounded-t h-1/3" />
-              <div className="flex-1 skeleton-light rounded-t h-1/2" />
-              <div className="flex-1 skeleton-light rounded-t h-2/3" />
-              <div className="flex-1 skeleton-light rounded-t h-2/5" />
-              <div className="flex-1 skeleton-light rounded-t h-3/4" />
-              <div className="flex-1 skeleton-light rounded-t h-1/2" />
-            </div>
-          </div>
-
-          {/* Pie charts skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[...Array(2)].map((_, i) => (
-              <div
-                key={i}
-                className="skeleton-card rounded-xl shadow-sm border p-6"
-              >
-                <div className="h-5 skeleton rounded w-40 mb-4" />
-                <div className="flex items-center justify-center h-[280px]">
-                  <div className="w-[180px] h-[180px] rounded-full border-[24px] skeleton" />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Monthly comparison skeleton */}
-          <div className="skeleton-card rounded-xl shadow-sm border p-6">
-            <div className="h-5 skeleton rounded w-48 mb-4" />
-            <div className="flex items-end gap-4 h-[280px] pt-8">
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-2/5" />
-                <div className="flex-1 skeleton-light rounded-t h-1/4" />
-              </div>
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-3/5" />
-                <div className="flex-1 skeleton-light rounded-t h-2/5" />
-              </div>
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-4/5" />
-                <div className="flex-1 skeleton-light rounded-t h-3/5" />
-              </div>
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-1/2" />
-                <div className="flex-1 skeleton-light rounded-t h-1/3" />
-              </div>
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-3/4" />
-                <div className="flex-1 skeleton-light rounded-t h-1/2" />
-              </div>
-              <div className="flex-1 flex gap-1 items-end">
-                <div className="flex-1 skeleton rounded-t h-[90%]" />
-                <div className="flex-1 skeleton-light rounded-t h-3/4" />
-              </div>
-            </div>
-          </div>
-
-          {/* Category progress bars skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[...Array(2)].map((_, i) => (
-              <div
-                key={i}
-                className="skeleton-card rounded-xl shadow-sm border p-6"
-              >
-                <div className="h-5 skeleton rounded w-40 mb-4" />
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-1.5">
-                      <div className="h-4 skeleton rounded w-20" />
-                      <div className="h-4 skeleton rounded w-24" />
-                    </div>
-                    <div className="w-full skeleton-light rounded-full h-2">
-                      <div className="skeleton h-2 rounded-full w-4/5" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1.5">
-                      <div className="h-4 skeleton rounded w-20" />
-                      <div className="h-4 skeleton rounded w-24" />
-                    </div>
-                    <div className="w-full skeleton-light rounded-full h-2">
-                      <div className="skeleton h-2 rounded-full w-3/5" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1.5">
-                      <div className="h-4 skeleton rounded w-20" />
-                      <div className="h-4 skeleton rounded w-24" />
-                    </div>
-                    <div className="w-full skeleton-light rounded-full h-2">
-                      <div className="skeleton h-2 rounded-full w-2/5" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1.5">
-                      <div className="h-4 skeleton rounded w-20" />
-                      <div className="h-4 skeleton rounded w-24" />
-                    </div>
-                    <div className="w-full skeleton-light rounded-full h-2">
-                      <div className="skeleton h-2 rounded-full w-1/4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  return (
-    <DashboardLayout>
+        }
+      >
       <div className="space-y-6 pb-20">
         {/* Header */}
         <div className="flex flex-col gap-4">
@@ -829,36 +828,38 @@ export default function ReportsPage() {
               Thu nhập vs Chi tiêu
             </h3>
             {dailyTrend.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={dailyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                  <YAxis
-                    tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
-                  />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="income"
-                    name="Thu nhập"
-                    stackId="1"
-                    stroke="#10B981"
-                    fill="#D1FAE5"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expense"
-                    name="Chi tiêu"
-                    stackId="2"
-                    stroke="#EF4444"
-                    fill="#FEE2E2"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ChartReveal delay={0.1}>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={dailyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis
+                      tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value: number) => formatCurrency(value)}
+                    />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="income"
+                      name="Thu nhập"
+                      stackId="1"
+                      stroke="#10B981"
+                      fill="#D1FAE5"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="expense"
+                      name="Chi tiêu"
+                      stackId="2"
+                      stroke="#EF4444"
+                      fill="#FEE2E2"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartReveal>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-gray-500">
                 Chưa có dữ liệu
@@ -877,35 +878,37 @@ export default function ReportsPage() {
                 Thu nhập theo nguồn
               </h3>
               {incomePieData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={280}>
-                  <PieChart>
-                    <Pie
-                      data={incomePieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {incomePieData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={INCOME_COLORS[index % INCOME_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number) => formatCurrency(value)}
-                    />
-                    <Legend
-                      layout="vertical"
-                      verticalAlign="middle"
-                      align="right"
-                      wrapperStyle={{ fontSize: "12px" }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <ChartReveal delay={0.2}>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <PieChart>
+                      <Pie
+                        data={incomePieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {incomePieData.map((_, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={INCOME_COLORS[index % INCOME_COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value: number) => formatCurrency(value)}
+                      />
+                      <Legend
+                        layout="vertical"
+                        verticalAlign="middle"
+                        align="right"
+                        wrapperStyle={{ fontSize: "12px" }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartReveal>
               ) : (
                 <div className="h-[280px] flex items-center justify-center text-gray-500">
                   Chưa có dữ liệu thu nhập
@@ -1214,6 +1217,7 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
+      </SkeletonTransition>
     </DashboardLayout>
   );
 }

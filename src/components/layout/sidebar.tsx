@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Wallet,
   Settings,
-  FileBarChart,
   PiggyBank,
   CalendarClock,
 } from "lucide-react";
@@ -19,7 +18,7 @@ const menuItems = [
   { href: "/expenses", label: "Chi tiêu", icon: Receipt },
   { href: "/budget", label: "Ngân sách", icon: PiggyBank },
   { href: "/recurring", label: "Định kỳ", icon: CalendarClock },
-  { href: "/reports", label: "Báo cáo", icon: FileBarChart },
+  // { href: "/reports", label: "Báo cáo", icon: FileBarChart },
 ];
 
 const settingsItems = [{ href: "/settings", label: "Cài đặt", icon: Settings }];

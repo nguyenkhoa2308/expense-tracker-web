@@ -7,8 +7,21 @@ export interface RefreshResponse {
     email: string;
     name: string | null;
     role: string;
+    salary: number | null;
+    onboarded: boolean;
     gmailConnected: boolean;
   };
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  salary: number | null;
+  onboarded: boolean;
+  gmailConnected: boolean;
+  createdAt: string;
 }
 
 export const authApi = {
@@ -26,5 +39,14 @@ export const authApi = {
 
   logout: () => api.post('/auth/logout'),
 
-  getProfile: () => api.get('/auth/profile'),
+  getProfile: () => api.get<UserProfile>('/auth/profile'),
+
+  updateProfile: (data: { name?: string; salary?: number }) =>
+    api.patch<UserProfile>('/auth/profile', data),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<{ message: string }>('/auth/change-password', { currentPassword, newPassword }),
+
+  completeOnboarding: (data: { name?: string; salary?: number; budgets?: { category: string; amount: number }[] }) =>
+    api.post<UserProfile>('/auth/onboarding', data),
 };

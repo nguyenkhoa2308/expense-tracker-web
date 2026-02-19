@@ -21,7 +21,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         )}
       >
         {label && (
-          <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+          <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
             {label}
           </span>
         )}
@@ -35,16 +35,16 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           />
           <div
             className={cn(
-              'w-11 h-6 rounded-full transition-all duration-200',
-              'bg-gray-200 peer-checked:bg-primary-500',
+              'switch-track w-11 h-6 rounded-full transition-all duration-200',
+              'peer-checked:!bg-primary-500',
               'peer-focus:ring-4 peer-focus:ring-primary-500/20',
               'peer-disabled:opacity-60 peer-disabled:cursor-not-allowed'
             )}
           />
           <div
             className={cn(
-              'absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-all duration-200',
-              'bg-white shadow-sm',
+              'switch-thumb absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-all duration-200',
+              'shadow-sm',
               'peer-checked:translate-x-5'
             )}
           />

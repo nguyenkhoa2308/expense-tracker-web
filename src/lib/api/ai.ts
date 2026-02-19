@@ -1,4 +1,4 @@
-import { api, getAccessToken } from './client';
+import { api, getAccessToken, setAccessToken } from './client';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -21,7 +21,7 @@ export const aiApi = {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     const token = getAccessToken();
 
-    const res = await fetch(`${baseUrl}/api/ai/chat`, {
+    let res = await fetch(`${baseUrl}/api/ai/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,6 +29,24 @@ export const aiApi = {
       },
       body: JSON.stringify({ message }),
     });
+
+    // Auto-refresh token on 401
+    if (res.status === 401) {
+      try {
+        const { data } = await api.post<{ access_token: string }>('/auth/refresh');
+        setAccessToken(data.access_token);
+        res = await fetch(`${baseUrl}/api/ai/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${data.access_token}`,
+          },
+          body: JSON.stringify({ message }),
+        });
+      } catch {
+        throw new Error('Session expired');
+      }
+    }
 
     if (!res.ok || !res.body) {
       throw new Error('Stream failed');

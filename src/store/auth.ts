@@ -8,6 +8,8 @@ interface User {
   email: string;
   name?: string | null;
   role: string;
+  salary?: number | null;
+  onboarded?: boolean;
   gmailConnected?: boolean;
 }
 
@@ -18,6 +20,7 @@ interface AuthState {
   register: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -60,4 +63,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, isLoading: false });
     }
   },
+
+  setUser: (user) => set({ user }),
 }));
