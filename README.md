@@ -1,5 +1,7 @@
 # Smart Expense Tracker - Frontend
 
+![FE CI](https://github.com/nguyenkhoa2308/expense-tracker-web/actions/workflows/ci.yml/badge.svg)
+
 Giao diện web cho ứng dụng quản lý chi tiêu thông minh, xây dựng bằng Next.js 16 với React 19.
 
 ## Giới thiệu

@@ -9,7 +9,7 @@ import {
   Loader2, Shield, Bell, Mail, RefreshCw, Check, X, User,
   CreditCard, Pencil, Lock, Save, CalendarClock,
 } from 'lucide-react';
-import { Input, Button, Switch, CurrencyInput } from '@/components/ui';
+import { Input, Button, Switch, CurrencyInput, ConfirmModal } from '@/components/ui';
 
 export default function SettingsPage() {
   const { user, checkAuth, setUser } = useAuthStore();
@@ -34,6 +34,9 @@ export default function SettingsPage() {
   const [showRemoveRecurring, setShowRemoveRecurring] = useState(false);
   const [salaryRecurringId, setSalaryRecurringId] = useState<string | null>(null);
   const [removingRecurring, setRemovingRecurring] = useState(false);
+
+  // Gmail disconnect confirm
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
 
   // Change password
   const [changingPassword, setChangingPassword] = useState(false);
@@ -80,7 +83,7 @@ export default function SettingsPage() {
   };
 
   const handleDisconnectGmail = async () => {
-    if (!confirm('Bạn có chắc muốn ngắt kết nối Gmail?')) return;
+    setShowDisconnectConfirm(false);
     try {
       await emailSyncApi.disconnectGmail();
       success('Đã ngắt kết nối Gmail');
@@ -462,7 +465,7 @@ export default function SettingsPage() {
                     <Button onClick={handleManualSync} loading={syncing} leftIcon={!syncing ? <RefreshCw size={16} /> : undefined}>
                       {syncing ? 'Đang đồng bộ...' : 'Đồng bộ ngay'}
                     </Button>
-                    <Button variant="outline" onClick={handleDisconnectGmail}>
+                    <Button variant="outline" onClick={() => setShowDisconnectConfirm(true)}>
                       Ngắt kết nối
                     </Button>
                   </div>
@@ -559,6 +562,14 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        open={showDisconnectConfirm}
+        title="Ngắt kết nối Gmail"
+        message="Bạn có chắc muốn ngắt kết nối Gmail? Hệ thống sẽ không tự động đồng bộ giao dịch từ email nữa."
+        confirmText="Ngắt kết nối"
+        onConfirm={handleDisconnectGmail}
+        onCancel={() => setShowDisconnectConfirm(false)}
+      />
     </DashboardLayout>
   );
 }

@@ -5,7 +5,7 @@ export { expenseApi } from './expenses';
 export type { Expense, ExpenseStats } from './expenses';
 export { incomeApi } from './incomes';
 export type { Income, IncomeStats } from './incomes';
-export { emailSyncApi } from './email-sync';
+export { emailSyncApi } from './emailSync';
 export { aiApi } from './ai';
 export type { ChatMessage, ParsedTransaction } from './ai';
 export { notificationApi } from './notifications';
