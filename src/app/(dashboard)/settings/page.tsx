@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuthStore, useToastStore } from '@/store';
@@ -12,6 +12,14 @@ import {
 import { Input, Button, Switch, CurrencyInput, ConfirmModal } from '@/components/ui';
 
 export default function SettingsPage() {
+  return (
+    <Suspense>
+      <SettingsContent />
+    </Suspense>
+  );
+}
+
+function SettingsContent() {
   const { user, checkAuth, setUser } = useAuthStore();
   const { success, error: toastError } = useToastStore();
   const searchParams = useSearchParams();
