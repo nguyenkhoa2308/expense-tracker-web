@@ -4,7 +4,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 const API_URL =
   typeof window !== 'undefined'
     ? '/api'
-    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    : `${process.env.API_URL || 'http://localhost:3001'}/api`;
 
 // In-memory access token (never stored in localStorage)
 let accessToken: string | null = null;
