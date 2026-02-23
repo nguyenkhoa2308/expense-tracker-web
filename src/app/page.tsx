@@ -30,7 +30,7 @@ export default function Home() {
           <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl shadow-lg shadow-primary-500/30 flex items-center justify-center">
             <Wallet size={32} className="text-white" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Smart Expense Tracker</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Expense Tracker</h1>
         </div>
         <div className="mt-8 flex gap-1.5">
           <div className="w-2 h-2 rounded-full bg-primary-600 animate-bounce" />
@@ -48,7 +48,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
       <div className="max-w-2xl text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-4">
-          💰 Smart Expense Tracker
+          💰 Expense Tracker
         </h1>
         <p className="text-xl text-gray-600 mb-8">
           Quản lý chi tiêu thông minh, theo dõi tài chính cá nhân dễ dàng

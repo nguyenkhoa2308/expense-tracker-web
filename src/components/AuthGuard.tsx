@@ -26,7 +26,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl shadow-lg shadow-primary-500/30 flex items-center justify-center">
             <Wallet size={32} className="text-white" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Smart Expense Tracker</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Expense Tracker</h1>
         </div>
         <div className="mt-8 flex gap-1.5">
           <div className="w-2 h-2 rounded-full bg-primary-600 animate-bounce" />

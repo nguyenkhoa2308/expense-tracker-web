@@ -51,7 +51,7 @@ export function Onboarding() {
         budgets: budgetData.length > 0 ? budgetData : undefined,
       });
       setUser(data);
-      success("Thiết lập hoàn tất! Chào mừng bạn đến với Smart Expense Tracker");
+      success("Thiết lập hoàn tất! Chào mừng bạn đến với Expense Tracker");
     } catch {
       useToastStore.getState().error("Có lỗi xảy ra, vui lòng thử lại");
     } finally {
